@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        #container {position:relative;width:500px;height: 500px;background-color:#ebebeb}
+        #item{position:absolute;width:100px;height:100px;background-color:blue}
+    </style>
+</head>
+
+<body>
+
+
+<div id="container">
+    <div id="item">
+
+    </div>
+</div>
+</body>
+<script>
+  (function(){
+    var targetBox = document.getElementById('item');
+
+
+    window.addEventListener('keydown',function(){
+      var key = event.key;
+      var top = targetBox.offsetTop;
+      var left = targetBox.offsetLeft;
+      var OFFSET = 10;
+
+      if(key === 'ArrowUp'){
+        targetBox.style.top = top-OFFSET+"px";
+      }else if (key === 'ArrowDown'){
+        targetBox.style.top = top+OFFSET+"px";
+      }else if (key === 'ArrowRight'){
+        targetBox.style.left = left+OFFSET+"px";
+      }else{
+        targetBox.style.left = left-OFFSET+"px";
+      }
+    });
+
+  })()
+
+</script>
+</html>
