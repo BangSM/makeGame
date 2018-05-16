@@ -21,50 +21,63 @@
     var target = document.getElementById('container');
 
     var ctx = target.getContext("2d");
-    var x = 0;
-    var y = 0;
 
-    ctx.fillRect(x,y,100,50);
+    var xy = [{x:0,y:0},{x:10,y:0}];
 
-
+    xy.forEach(function(item){
+      ctx.fillRect(item.x,item.y,10,5);
+    });
 
 
     window.addEventListener('keydown',function(){
       var key = event.key;
-      var OFFSET = 10;
-      var MAXWIDTH = 200;
-      var MAXHEIGHT = 100;
+      var OFFSETY = 5;
+      var OFFSETX = 10;
+      var MAXWIDTH = 290;
+      var MAXHEIGHT = 145;
       var MINWIDTH = 0;
       var MINHEIGHT = 0;
-
       ctx.clearRect(0,0,target.width,target.height);
-      if(key === 'ArrowUp'){
-        y = y-OFFSET;
-        if(y < MINHEIGHT){
-          y = MINHEIGHT;
+
+      xy.forEach(function(item, idx){
+        if(key === 'ArrowUp'){
+          item.y = item.y-OFFSETY;
+          if(item.y < MINHEIGHT){
+            item.y = MINHEIGHT;
+          }
+
+        }else if (key === 'ArrowDown'){
+          item.y = item.y+OFFSETY;
+          if(item.y > MAXHEIGHT){
+            item.y = MAXHEIGHT;
+          }
+
+        }else if (key === 'ArrowRight'){
+          render(idx);
+          item.x = item.x+OFFSETX;
+
+          if(item.x  > MAXWIDTH){
+            item.x = MAXWIDTH;
+          }
+
+        }else{
+          item.x = item.x-OFFSETX;
+          if(item.x < MINWIDTH){
+            item.x = MINWIDTH;
+          }
         }
 
-      }else if (key === 'ArrowDown'){
-        y = y+OFFSET;
-        if(y > MAXHEIGHT){
-          y = MAXHEIGHT;
-        }
-
-      }else if (key === 'ArrowRight'){
-        x = x+OFFSET;
-        if(x > MAXWIDTH){
-          x = MAXWIDTH;
-        }
-
-      }else{
-        x = x-OFFSET;
-        if(x < MINWIDTH){
-          x = MINWIDTH;
-        }
-      }
-      ctx.fillRect(x,y,100,50);
+      });
+      ctx.fillRect(xy.x,xy.y,10,5);
     });
 
+    function render(idx){
+      if(idx === 0){
+        xy.shift();
+
+      }
+
+    }
   })()
 
 </script>
