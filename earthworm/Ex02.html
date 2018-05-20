@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        #container {position:relative;width:500px;height:500px;background-color:#ebebeb}
+    </style>
+</head>
+
+<body>
+<div>
+    <canvas id="container">
+
+    </canvas>
+</div>
+<button type="button" id="AI" >
+    AI
+</button>
+</body>
+<script>
+  (function(){
+    var button = document.getElementById('AI');
+    var target = document.getElementById('container');
+    var ctx = target.getContext("2d");
+    var MAXTAGETX = 300;
+    var MAXTAGETY = 150;
+    var xy = [{x:0,y:0},{x:10,y:0},{x:20,y:0}];
+    var foodXY = [{x:40,y:30}];
+    var key = 0;
+    var interval;
+
+    // 지렁이 셋팅
+    xy.forEach(function(item){
+      ctx.fillRect(item.x,item.y,10,5);
+    });
+
+    function a(){
+        interval = setInterval(function(){
+            var randomNumber = Math.floor(Math.random()*2);
+            var copyArray = xy;
+            copyArray = copyArray.slice(0);
+            var head = copyArray.pop();
+            var x = head.x - foodXY[0].x;
+            var y = head.y - foodXY[0].y;
+            var setXY = [0,1];
+            if(x < 0 && y < 0){
+                setXY = [0,3];
+            }else if(x < 0 && y > 0){
+                setXY = [0,2];
+            }else if(x > 0 && y > 0){
+                setXY = [1,2]
+            }else if(x > 0 && y < 0){
+                setXY = [1,3]
+            }else if(x === 0 && y < 0){
+                setXY = [3,3];
+            }else if(x === 0 && y > 0){
+                setXY = [2,2];
+            }else if(y === 0 && x > 0){
+                setXY = [1,1];
+            }else{
+                setXY = [0,0];
+            }
+            var direction = eval(setXY[randomNumber]);
+
+            var newHead = {};
+            if(direction === 0){
+
+
+                newHead = {x : head.x+10 , y : head.y};
+
+
+            }
+            if(direction === 1){
+
+
+                newHead = {x :head.x-10,y:head.y};
+
+
+            }
+            if(direction === 2){
+
+
+                newHead = {x :head.x,y:head.y-5};
+
+
+            }
+            if(direction === 3){
+
+
+                newHead = {x :head.x,y:head.y+5};
+
+
+            }
+
+            var check = checkArr(xy,newHead);
+            moveAI(check,newHead);
+            foodEatCheck(newHead);
+            foodRender();
+        },100);
+    }
+
+    button.addEventListener('click',function(){
+        a();
+    });
+
+    window.addEventListener('keydown',function(){
+      key = event.keyCode;
+
+      if(key<41 && key>36){
+          clearInterval(interval);
+          interval = setInterval(function(){
+              var copyArray = xy;
+              copyArray = copyArray.slice(0);
+              var head = copyArray.pop();
+              var newHead = {};
+          if(key === 39){
+
+
+              newHead = {x : head.x+10 , y : head.y};
+
+
+          }
+          if(key === 37){
+
+
+              newHead = {x :head.x-10,y:head.y};
+
+
+          }
+          if(key === 38){
+
+
+              newHead = {x :head.x,y:head.y-5};
+
+
+          }
+
+          if(key === 40){
+
+
+              newHead = {x :head.x,y:head.y+5};
+
+
+          }
+
+          var check = checkArr(xy,newHead);
+          move(check,newHead);
+          foodEatCheck(newHead);
+          foodRender();
+
+
+          },100);
+      }
+
+    });
+    // 지렁이 초기화
+    function clear(){
+        ctx.clearRect(0,0,target.width,target.height);
+    }
+
+    // 지렁이 그리기
+    function render(){
+        clear();
+        xy.forEach(function(item){
+            ctx.fillRect(item.x,item.y,10,5);
+        });
+    }
+
+
+    //AI 움직이기
+    function moveAI(check,val) {
+        var randomNum = Math.floor(Math.random()*100);
+          if(check){
+              if(randomNum === 50){
+                  endGame();
+              }else{
+                  clearInterval(interval);
+                  a();
+              }
+          }else{
+              xy.push(val);
+              xy.shift();
+              render();
+          }
+          crashCheck(val);
+      }
+
+    //지렁이 움직이기
+    function move(check,val) {
+        if(check){
+             endGame();
+        }else{
+            xy.push(val);
+            xy.shift();
+            render();
+        }
+        crashCheck(val);
+    }
+
+    // 먹이 그리기
+    function foodRender(){
+        var check = checkArr(xy , foodXY);
+        if(check === false){
+            ctx.fillRect(foodXY[0].x,foodXY[0].y,10,5);
+        }else{
+            var x = Math.floor(Math.random()*(MAXTAGETX/10)) *10;
+            var y = Math.floor(Math.random()*(MAXTAGETY/5)) * 5;
+            foodXY = [{x : x, y: y}];
+            foodRender();
+        }
+    }
+    
+    // 지렁이 늘리기
+    function addWidth() {
+        var xy0 = xy[0];
+        var xy1 = xy[1];
+        var newTail = {};
+        var copyArray = xy;
+        copyArray = copyArray.slice();
+
+        if(xy0.x === xy1.x){
+            if(xy0.y - xy1.y > 0){
+                newTail = {x : xy0.x , y:xy0.y + 5}
+            }else{
+                newTail = {x : xy0.x , y:xy0.y - 5}
+            }
+
+        }
+
+        if(xy0.y === xy1.y) {
+
+            if (xy0.x - xy1.x > 0) {
+                newTail = {x: xy0.x + 10, y: xy0.y}
+            } else {
+                newTail = {x: xy0.x - 10, y: xy0.y}
+            }
+        }
+        copyArray.unshift(newTail);
+        xy = copyArray;
+        render();
+    }  
+
+    // 먹이를 먹었는지 확인
+    function foodEatCheck(val){
+        var check = false;
+        if(foodXY[0].x === val.x && foodXY[0].y === val.y){
+            var x = Math.floor(Math.random()*MAXTAGETX/10) *10;
+            var y = Math.floor(Math.random()*MAXTAGETY/5) * 5;
+            foodXY = [{x : x, y: y}];
+            check = true;
+            foodRender();
+            addWidth();
+        }
+        return check;
+    }
+
+    // 배열에 같은 좌표가 있는지 확인
+    function checkArr(targetArr , val){
+        var check = false;
+        targetArr.forEach(function (item) {
+            if(item.x === val.x && item.y === val.y){
+                check = true ;
+            }
+        });
+        return check;
+      }
+
+    // 부딪혔는지 확인
+    function crashCheck(val) {
+        if(MAXTAGETX === val.x || MAXTAGETY === val.y){
+            endGame();
+        }
+        if(val.x === -10 || val.y === -5){
+            endGame();
+        }
+    }
+
+    // 게임 끝
+    function endGame(){
+         alert('지렁이 사망');
+         window.location.reload();
+
+    }
+
+
+  })()
+
+</script>
+</html>
